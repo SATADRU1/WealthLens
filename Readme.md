@@ -1,0 +1,1 @@
+An intelligent financial research assistant that provides deep, AI-powered analysis of financial queries.
