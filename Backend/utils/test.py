@@ -118,7 +118,7 @@ if __name__ == "__main__":
     print("\nðŸ“Œ Query Result (PDFs):\n", answer)
 
     # Example stock query
-    stock_info = query_stock("RTX", period="5d")
-    print("\nðŸ’¹ Stock Data (RTX):\n", stock_info)
+    stock_info = query_stock("SATS")
+    print("\nðŸ’¹ Stock Data (GOOGL):\n", stock_info)
 
     print("\nðŸ§¾ Steps Taken:\n", STEPS_TAKEN)

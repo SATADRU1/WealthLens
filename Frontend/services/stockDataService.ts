@@ -141,21 +141,30 @@ class StockDataService {
    */
   private parseStockResponse(response: any, symbol: string): StockPrice | null {
     try {
-      let content = '';
+      let content: string | undefined = undefined;
       
-      // Extract the answer content
-      if (response.answer && typeof response.answer === 'object' && 'answer' in response.answer) {
-        content = response.answer.answer;
-      } else if (response.answer && typeof response.answer === 'string') {
-        content = response.answer;
-      } else {
+      // Extract the answer content safely from various backend shapes
+      const ans = response?.answer;
+      if (ans && typeof ans === 'object') {
+        if (typeof (ans as any).answer === 'string' && (ans as any).answer.trim()) {
+          content = (ans as any).answer;
+        } else if (typeof (ans as any).content === 'string' && (ans as any).content.trim()) {
+          content = (ans as any).content;
+        } else if (typeof (ans as any).text === 'string' && (ans as any).text.trim()) {
+          content = (ans as any).text;
+        }
+      } else if (typeof ans === 'string' && ans.trim()) {
+        content = ans;
+      }
+
+      if (typeof content !== 'string' || !content) {
         return null;
       }
 
-      // Parse the markdown response to extract stock data
-      const priceMatch = content.match(/Current Price.*?₹([\d,]+\.?\d*)/i);
-      const changeMatch = content.match(/Change.*?₹([+-]?[\d,]+\.?\d*)\s*\(([+-]?[\d.]+)%\)/i);
-      const previousCloseMatch = content.match(/Previous Close.*?₹([\d,]+\.?\d*)/i);
+      // Parse the markdown/plaintext response to extract stock data (supports ₹ or $)
+      const priceMatch = content.match(/(Current Price|Price).*?[₹$]?\s*([\d,]+\.?\d*)/i);
+      const changeMatch = content.match(/Change.*?[₹$]?\s*([+-]?[\d,]+\.?\d*)\s*\(([+-]?[\d.]+)%\)/i);
+      const previousCloseMatch = content.match(/Previous Close.*?[₹$]?\s*([\d,]+\.?\d*)/i);
       const volumeMatch = content.match(/Volume.*?([\d,]+)/i);
       
       if (!priceMatch) {
